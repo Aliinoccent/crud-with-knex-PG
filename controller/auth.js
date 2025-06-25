@@ -1,5 +1,5 @@
 const knex = require("../config/db/database")
-const { hashPas } = require('../utility/hash');
+const { hashPas ,verifyPas} = require('../utility/hash');
 const { generateToken } = require("../utility/jwt");
 exports.signup = async (req, res) => {
     const { user_name, age, email, password } = req.body;
@@ -28,6 +28,11 @@ exports.login = async (req, res) => {
         if (!dbUser) {
             return res.status(401).json("user not found");
         }
+        const varify = await verifyPas(dbUser.password,password);
+        if(varify===false){
+            return res.status(400).json({status:false,message:'ENTER THE CORRECT PASWORD'});
+        }
+
         const token =await generateToken(email);
         return res.status(200).json({ status: true, token });
     } catch (error) {
