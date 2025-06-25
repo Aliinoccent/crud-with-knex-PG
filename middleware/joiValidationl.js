@@ -3,14 +3,14 @@ const Joi = require('joi');
 const validation = (req,res,next) => {
     try {
         const schema = Joi.object({
-            user_name: Joi.string(),
+            user_name: Joi.string().required(),
             email: Joi.string().email().required(),
-            password: Joi.string(),
-            age: Joi.number().min(1).max(120)
+            password: Joi.string().required(),
+            age: Joi.number().min(1).max(120).required()
         })
         const userschema = schema.validate(req.body);
         if (userschema.error) {
-            console.error('Validation error:', validationResult.error.message);
+            console.error('Validation error:', userschema.error.message);
             return res.status(400).json({ status: false, messege: userschema.error.message });
         }
         next();

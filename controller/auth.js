@@ -4,9 +4,6 @@ const {generateToken}=require("../utility/jwt");
 exports.signup = async (req, res) => {
     const { user_name,age,email, password } = req.body;
     try {
-        if (!user_name || !email || !password) {
-            return res.status(400).json({ status: 200, messege: "all field are requireed" });
-        }
         const hash =  await hashPas(password);
         console.log(hash);
         const isExist= await knex('users').where({email}).first();
