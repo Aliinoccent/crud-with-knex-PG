@@ -9,9 +9,12 @@ exports.signup = async (req, res) => {
         }
         const hash =  await hashPas(password);
         console.log(hash);
-        const newuser = await knex("users").insert({ user_name, email, password: hash,age }).then(result=>{
-            knex.select()
-        })
+        const isExist= await knex('users').where({email}).first();
+        if(isExist){
+            return res.status(404).json({status:false,messege:"user already exist"});
+        }
+        
+        const newuser = await knex("users").insert({ user_name, email, password: hash,age })
         console.log(newuser)
         return res.status(200).json({ status: true, newuser });
 
