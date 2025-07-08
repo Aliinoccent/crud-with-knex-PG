@@ -84,42 +84,37 @@ exports.getTokenHistory = async (req, res) => {
         // if (!chain) {
         //     return res.status(400).json({ status: false, messege: "required chain" })
         // }
-        // get token price here 
-        // const response = await Moralis.EvmApi.token.getTokenPrice({
-        //     "chain": chain,
-        //     "include": "percent_change",
-        //     "address": tokenAddress
-        // });
-        // console.log(response.raw);
-        // res.status(200).json({ ok: "ok" })
-        // ALETERNATE MATHOD 
-        // const response = await fetch(` https://deep-index.moralis.io/api/v2.2/erc20/${tokenAddress}/price?chain=base`, {
-        //     method: 'Get',
-        //     headers: {
-        //         'X-API-Key': process.env.MORALIS_API_KEY,
-        //         "Content-Type": "application/json"
-        //     }
-        // })
-        // const data = await response.json();
-        // console.log(data);
-        // res.status(200).json({ ok: "ok" })
+      
         // GET HITOROY OF TOKEN BY COVELENT API KIY 
         const API_KEY = process.env.COVELANT_API_KEY; // your apiKey
         const CURRENCY = "Ebaseth";
         const chainName = 8453; // we will check price of BTC in this sample
-        const DATE1 = "2025-01-01"; // Start date
-        const DATE2 = "2025-02-02"; // End date
-        // var url = `https://api.covalenthq.com/v1/pricing/historical_by_addresses_v2/${chainName}/from=${DATE1}to=${DATE2}/${tokenAddress}/`
-        // console.log(url);
-        // Make a request to Covalent API
+        const DATE1 = "2024-07-07"; // Start date
+        const DATE2 = "2025-07-07"; // End date
+        let saveData;
+    
         const options = { method: 'GET', headers: { Authorization: `Bearer ${API_KEY}`} };
 console.log(`https://api.covalenthq.com/v1/pricing/historical_by_addresses_v2/${chainName}/USD/${tokenAddress}/?from=${DATE1}&to=${DATE2}`)
-        fetch(`https://api.covalenthq.com/v1/pricing/historical_by_addresses_v2/${chainName}/USD/${tokenAddress}/`, options)
+        fetch(`https://api.covalenthq.com/v1/pricing/historical_by_addresses_v2/${chainName}/USD/${tokenAddress}/?from=${DATE1}&to=${DATE2}&prices-at-asc=true`, options)
             .then(response => response.json())
             .then(data =>{ console.log(data)
-        return res.json({data})})
+                let arr =[]
+                data.data.forEach((value , index) =>{
+                   value.prices.forEach(price=>{
+                
+                    arr.push({price: price.price , date:price.date});
+                   })
+                })
+          
+    
+        return res.json({result:"one year result",arr})
+        
+    })
             .catch(err => console.error(err));
+            const save=await   knex("History",).insert({tokenAddress,created_at:new Date(),chain:chainName}).returning("tokenAddress");
+                  console.log('save',save);
     }
+
     catch (error) {
         console.log(error)
     }
