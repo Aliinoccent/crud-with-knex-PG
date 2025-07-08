@@ -1,6 +1,6 @@
 const {createUsers,getAllUsers,getById,deleteUserById,updateUser}=require('../controller/users');
 const { signup, login } = require('./auth');
-const {getBalance,walletBalance,nftsBalance,getAllBalances,getTokenHistory}=require('./moralis');
+const {getBalance,walletBalance,nftsBalance,getAllBalances,getTokenHistory,depositTokenPrice,userGraph}=require('./moralis');
 module.exports={
     createUsers,
     getAllUsers,
@@ -13,5 +13,7 @@ module.exports={
     walletBalance,
     nftsBalance,
     getAllBalances,
-    getTokenHistory
+    getTokenHistory,
+    depositTokenPrice,
+    userGraph
 }

@@ -2,7 +2,7 @@ const knex = require("../config/db/database")
 const { hashPas ,verifyPas} = require('../utility/hash');
 const { generateToken } = require("../utility/jwt");
 exports.signup = async (req, res) => {
-    const { user_name, age, email, password } = req.body;
+    const { user_name, email, password } = req.body;
     try {
         const hash = await hashPas(password);
         console.log(hash);
@@ -11,7 +11,7 @@ exports.signup = async (req, res) => {
             return res.status(404).json({ status: false, messege: "user already exist" });
         }
 
-        const newuser = await knex("users").insert({ user_name, email, password: hash, age })
+        const newuser = await knex("users").insert({ user_name, email, password: hash, created_at:new Date()})
         console.log(newuser)
         return res.status(200).json({ status: true, newuser });
 

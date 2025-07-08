@@ -3,9 +3,11 @@
  * @returns { Promise<void> }
  */
 exports.up = function(knex) {
-return knex.schema.createTable('users',(table)=>{
-    table.string("hobbies")
-})
+  return knex.schema.createTable("deposit",(t)=>{
+    t.increments("id").primary
+    t.integer("user_id").notNullable();
+    t.integer('depositPrice').notNullable();
+  })
 };
 
 /**
@@ -13,5 +15,5 @@ return knex.schema.createTable('users',(table)=>{
  * @returns { Promise<void> }
  */
 exports.down = function(knex) {
-  
+  return knex.schema.dropTable("deposit");
 };

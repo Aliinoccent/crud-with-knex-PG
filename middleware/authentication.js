@@ -9,10 +9,12 @@ const authentication=async (req,res ,next)=>{
             return res.status(404).json({status:false,messege:"token required"});
         }
        const user_email=  jwt.verify(token,process.env.KEY);
-       const userFound=await knex("users").select('*').where({email:user_email}).first();
+       console.log("user-email",user_email)
+       const userFound=await knex("users").select('*').where({email:user_email.email}).first();
        if(!userFound){
         return res.status(400).json({status:false , messege:"unauthrized access"})
     }
+
        console.log(user_email);
        req.user=userFound;
        next();

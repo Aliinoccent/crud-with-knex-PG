@@ -4,6 +4,7 @@ const chain = EvmChain.BASE;
 const knex = require("../config/db/database");
 require('dotenv').config();
 const axios = require('axios');
+const { response } = require("express");
 
 exports.getBalance = async (req, res) => {
     const { address } = req.body;
@@ -76,7 +77,8 @@ exports.nftsBalance = async (req, res) => {
     }
 }
 exports.getTokenHistory = async (req, res) => {
-    const { tokenAddress, chai } = req.body;
+    const { tokenAddress, tokenName } = req.body;
+    const obj=req.user
     try {
         if (!tokenAddress) {
             return res.status(400).json({ status: false, messege: "required token field" })
@@ -92,30 +94,74 @@ exports.getTokenHistory = async (req, res) => {
         const DATE1 = "2024-07-07"; // Start date
         const DATE2 = "2025-07-07"; // End date
         let saveData;
-    
+          let arr =[]
         const options = { method: 'GET', headers: { Authorization: `Bearer ${API_KEY}`} };
 console.log(`https://api.covalenthq.com/v1/pricing/historical_by_addresses_v2/${chainName}/USD/${tokenAddress}/?from=${DATE1}&to=${DATE2}`)
-        fetch(`https://api.covalenthq.com/v1/pricing/historical_by_addresses_v2/${chainName}/USD/${tokenAddress}/?from=${DATE1}&to=${DATE2}&prices-at-asc=true`, options)
-            .then(response => response.json())
-            .then(data =>{ console.log(data)
-                let arr =[]
+      const response=await  fetch(`https://api.covalenthq.com/v1/pricing/historical_by_addresses_v2/${chainName}/USD/${tokenAddress}/?from=${DATE1}&to=${DATE2}&prices-at-asc=true`, options)
+           
+              const data=await response.json();
+
                 data.data.forEach((value , index) =>{
                    value.prices.forEach(price=>{
                 
                     arr.push({price: price.price , date:price.date});
                    })
                 })
-          
-    
-        return res.json({result:"one year result",arr})
         
-    })
-            .catch(err => console.error(err));
-            const save=await   knex("History",).insert({tokenAddress,created_at:new Date(),chain:chainName}).returning("tokenAddress");
-                  console.log('save',save);
+    
+
+            await Promise.all(
+                arr.map(price_val=>{
+                   return  knex("History").insert({tokenAddress,created_at:new Date(),chain:chainName,price:price_val.price,History_created_at:price_val.date,user_id:obj.id,tokenName})
+                })
+
+            ).then(response=>console.log("data inserted"))
+
+            return res.json({result:"one year result",arr})
+
+    
     }
 
     catch (error) {
         console.log(error)
+    }
+}
+exports.depositTokenPrice=async(req,res)=>{
+    const {depositePrice}=req.body;
+    const obj=req.user;
+    try {
+        if(!depositePrice){
+            return res.status(400).json({messege:"required deposite price"});
+        }
+        if(depositePrice.length<=0){
+            return res.status(404).json({messege:"requied minimum 1 $"});
+        }
+    //    const db= await knex("deposit").insert({user_id:obj.id,depositPrice:depositePrice}).returning()
+     const pricesArr=  await knex("History").select("price")
+
+       pricesArr.forEach(item=>{
+       item.price= depositePrice*item.price
+       })
+       console.log(pricesArr);
+       await Promise.all(
+        pricesArr.map(item=>{
+            return knex("userGraph").insert({graph_price:item.price,user_id:obj.id})
+        })
+       
+       )
+       return res.status(200).json({status :true,messege:"db"});
+        
+
+    } catch (error) {
+        res.status(500).json({messege:'server error'})
+    }
+}
+exports.userGraph=async(req,res)=>{
+    const user=req.user
+    try {
+        const userobj=await knex("History").join("usergraph","History.user_id","userGraph.user_id").select().where("History.user_id",user.id);
+        res.status(200).json(userobj);
+    } catch (error) {
+        return res.status(500).json(error)
     }
 }

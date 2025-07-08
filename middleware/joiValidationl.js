@@ -6,7 +6,6 @@ exports.validationSignup = (req,res,next) => {
             user_name: Joi.string().required(),
             email: Joi.string().email().required(),
             password: Joi.string().required(),
-            age: Joi.number().min(1).max(120).required()
         })
         const userschema = schema.validate(req.body);
         if (userschema.error) {
