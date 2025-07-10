@@ -7,7 +7,6 @@ exports.up = function(knex) {
     table.increments("id").primary();
     table.string("graph_price").nullable();
     table.integer("user_id").notNullable();
-  
   })
 };
 
