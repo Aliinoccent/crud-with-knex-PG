@@ -176,7 +176,7 @@ exports.userGraph = async (req, res) => {
                 "History_created_at",
                 "deposit.depositPrice",
                 knex.raw('"deposit"."depositPrice"/SUM("History"."price")  as "totalPrice"')
-            ).where("History.user_id", 1)
+            ).where("History.user_id", user.id)
             .groupBy("History_created_at", "deposit.depositPrice")
             .orderBy("History_created_at", "asc");
         console.log(groupByPrice);
