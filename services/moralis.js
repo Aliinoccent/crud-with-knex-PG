@@ -1,4 +1,5 @@
 const knex = require('../config/db/database')
+const HTTP=require('../utility/http')
 module.exports = {
     getBalance: async (req, res) => {
         const { address } = req.body;
@@ -11,16 +12,23 @@ module.exports = {
             const isaddress = await knex("moralis").select('*').where({ address }).first();
             if (!isaddress) {
                 const balance = await knex("moralis").insert({ nativeBalance: balance }).returning("nativeBalance")
-                return res.status(200).json({ status: true, messege: balance })
+                // return res.status(200).json({ status: true, messege: balance })
+                return {
+                    status:HTTP.OK,
+                    body:balance
+                }
             }
             if (isaddress && isaddress.nativeBalance !== nativeBalance) {
                 await knex("moralis").where({ address }).update({ nativeBalance: balance })
-                return res.status(200).json({ status: true, messege: nativeBalance });
+                // return res.status(200).json({ status: true, messege: nativeBalance });
+                return{
+                    status:HTTP.OK,
+                    body:nativeBalance
+                }
             }
 
         } catch (error) {
             console.log(error);
-            return res.status(500).json({ status: false, messege: "server error" });
         }
     },
     walletBalance: async (req, res) => {
@@ -36,37 +44,45 @@ module.exports = {
 
             console.log(balance, 'this is balance here');
             if (balance === undefined) {
-                return res.status(400).json({ status: false, messege: "balnce empty" })
+                // return res.status(400).json({ status: false, messege: "balnce empty" })
+                throw{
+                    status:HTTP.BAD_REQUEST,
+                    body:"balance empty"
+                }
             }
             const isaddress = await knex("moralis").select('*').where({ address }).first();
             if (!isaddress) {
                 const dbBalance = await knex("moralis").insert({ address, walletBalance: balance }).returning("WalletBalance")
-                return res.status(200).json({ status: true, messege: dbBalance })
-            }
-
+                // return res.status(200).json({ status: true, messege: dbBalance })
+                return{
+                    status:HTTP.OK,
+                    body:dbBalance
+                }  }
             if (isaddress && isaddress.walletBalance !== walletBalance) {
                 await knex("moralis").where({ address }).update({ walletBalance: balance })
-                return res.status(200).json({ status: true, messege: balance });
+                // return res.status(200).json({ status: true, messege: balance });
+                return{
+                    status:HTTP.OK,
+                    body:balance  }
             }
-
         } catch (error) {
             console.log(error);
-            return res.status(500).json({ status: false, messege: "server error" })
         }
     },
     nftsBalance: async (req, res) => {
         const { address } = req.body;
         try {
-
             const nftsBalances = await Moralis.EvmApi.nft.getWalletNFTs({
                 address,
                 chain,
                 limit: 10,
             });
-            return res.status(200).json(nftsBalances)
+            return{
+                status:HTTP.OK,
+                body:nftsBalances
+            }
         } catch (error) {
             console.log(error);
-            return res.status(500).json({ status: false, messege: "server error" })
         }
     },
     getTokenHistory: async (req, res) => {
@@ -100,7 +116,11 @@ module.exports = {
                     })
                 })
             } else {
-                return res.status(400).json(data.error_message)
+                // return res.status(400).json(data.error_message)
+                throw{
+                    status:HTTP.BAD_REQUEST,
+                    body:data.error_message
+                }
 
             }
             await Promise.all(
@@ -117,7 +137,11 @@ module.exports = {
                         })
                 })
             ).then(response => console.log("data inserted"))
-            return res.json({ result: "one year result", arr })
+            // return res.json({ result: "one year result", arr })
+            return{
+                status:HTTP.OK,
+                body:{result:"one year result",arr}
+            }
         }
         catch (error) {
             console.log(error)
@@ -128,10 +152,16 @@ module.exports = {
         const obj = req.user;
         try {
             if (!depositePrice) {
-                return res.status(400).json({ messege: "required deposite price" });
+                 throw{
+                    status:HTTP.BAD_REQUEST,
+                    body:"required deposite price"
+                }
             }
             if (depositePrice.length <= 0) {
-                return res.status(404).json({ messege: "requied minimum 1 $" });
+                throw{
+                    status:HTTP.BAD_REQUEST,
+                    body:"required minimum 1$"
+                }
             }
             const db = await knex("deposit").insert({ user_id: obj.id, depositPrice: depositePrice }).returning()
             const pricesArr = await knex("History").select("price")
@@ -146,7 +176,10 @@ module.exports = {
                 })
 
             )
-            return res.status(200).json({ status: true, messege: "db" });
+            return{
+                status:HTTP.OK,
+                body:{status:true,db:"db"}
+            } 
 
 
         } catch (error) {
@@ -170,11 +203,14 @@ module.exports = {
                 .groupBy("History_created_at")
                 .orderBy("History_created_at", "asc");
             console.log(groupByPrice);
-            return res.status(200).json(groupByPrice);
+            return{
+                status:HTTP.OK,
+                body:groupByPrice
+            }
 
         } catch (error) {
             console.log(error)
-            return res.status(500).json(error)
+          throw{error}
         }
     }
 

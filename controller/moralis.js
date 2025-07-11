@@ -4,53 +4,57 @@ const chain = EvmChain.BASE;
 const knex = require("../config/db/database");
 require('dotenv').config();
 const service = require('../services/moralis')
+const Response = require('../utility/response')
 exports.getBalance = async (req, res) => {
-    try {
-        service.getBalance(req, res);
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ status: false, messege: "server error" });
-    }
-}
-exports.walletBalance = async (req, res) => {
-    try {
-        service.walletBalance(req, res);
-    }
-    catch (error) {
-        console.log(error);
-        return res.status(500).json({ status: false, messege: "server error" })
-    }
-}
-exports.nftsBalance = async (req, res) => {
-    try {
-        service.nftsBalance(req, res);
-    }
-    catch (error) {
-        console.log(error);
-        return res.status(500).json({ status: false, messege: "server error" })
-    }
-}
-exports.getTokenHistory = async (req, res) => {
-    try {
-        service.getTokenHistory(req, res);
-    }
-    catch (error) {
-        console.log(error)
-    }
-}
-exports.depositTokenPrice = async (req, res) => {
-    try {
-        service.depositTokenPrice(req, res);
-    } catch (error) {
-        res.status(500).json({ messege: 'server error' })
-    }
-}
-exports.userGraph = async (req, res) => {
-    try {
-        service.userGraph(req, res);
-    }
-    catch (error) {
+
+    service.getBalance(req, res).then(resp => {
+        return Response.send.Raw(res, resp.status, resp.body);
+    }).catch(error => {
         console.log(error)
         return res.status(500).json(error)
-    }
+    })
+}
+exports.walletBalance = async (req, res) => {
+    service.walletBalance(req, res).then(resp => {
+        return Response.send.Raw(res, resp.status, resp.body);
+    }).catch(error => {
+            console.log(error)
+            return res.status(500).json(error)
+        })
+}
+exports.nftsBalance = async (req, res) => {
+    service.nftsBalance(req, res).then(resp => {
+        return Response.send.Raw(res, resp.status, resp.body);
+    }).catch(error => {
+        console.log(error)
+        return res.status(500).json(error)
+    })
+}
+exports.getTokenHistory = async (req, res) => {
+
+    service.getTokenHistory(req, res).then(resp => {
+        return Response.send.Raw(res, resp.status, resp.body);
+    }).catch(error => {
+        console.log(error)
+        return res.status(500).json(error)
+    })
+}
+exports.depositTokenPrice = async (req, res) => {
+    service.depositTokenPrice(req, res).then(resp => {
+        return Response.send.Raw(res, resp.status, resp.body);
+    }).catch(error => {
+        console.log(error)
+        return res.status(500).json(error)
+    })
+}
+
+exports.userGraph = async (req, res) => {
+
+    service.userGraph(req, res).then(resp => {
+        return Response.send.Raw(res, resp.status, resp.body);
+    }).catch(error => {
+        console.log(error)
+        return res.status(500).json(error)
+    })
+
 }
