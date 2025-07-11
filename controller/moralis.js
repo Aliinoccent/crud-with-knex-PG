@@ -172,12 +172,14 @@ exports.userGraph = async (req, res) => {
 
         const groupByPrice = await knex("History")
             .join("deposit", "History.user_id", "deposit.user_id")
-            .select(
+           .where("deposit.user_id", user.id)
+           .where ("History.user_id",user.id)
+             .select(
                 "History_created_at",
-                "deposit.depositPrice",
-                knex.raw('"deposit"."depositPrice"/SUM("History"."price")  as "totalPrice"')
-            ).where("History.user_id", user.id)
-            .groupBy("History_created_at", "deposit.depositPrice")
+                knex.raw('SUM("deposit"."depositPrice" )as total_deposit_price '),
+                knex.raw('SUM("deposit"."depositPrice")/SUM("History"."price")  as "totalPrice"')
+            )
+            .groupBy("History_created_at")
             .orderBy("History_created_at", "asc");
         console.log(groupByPrice);
         return res.status(200).json(groupByPrice);
