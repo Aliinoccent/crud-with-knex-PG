@@ -4,6 +4,7 @@ const mainRouters =require('./routers/index.route');
 const express=require("express");
 const Moralis_connection=require('./config/moralis/moralis')
 const precitce=require('./prectice only/prectic1')
+const errorHandling=require('./middleware/error');
 
 const morgan =require('morgan');
 const app=express();
@@ -13,6 +14,7 @@ app.use("/",mainRouters);
 Moralis_connection();
 
 precitce.trunk();
+app.use(errorHandling);
 const port=process.env.PORT|| 5002;
 app.listen(port,()=>{
 console.log("app listen on port :",port)

@@ -29,6 +29,7 @@ module.exports = {
 
         } catch (error) {
             console.log(error);
+            throw(error)
         }
     },
     walletBalance: async (req, res) => {
@@ -119,24 +120,24 @@ module.exports = {
                 // return res.status(400).json(data.error_message)
                 throw{
                     status:HTTP.BAD_REQUEST,
-                    body:data.error_message
+                    error:data.error_message
                 }
 
             }
-            await Promise.all(
-                arr.map(price_val => {
-                    return knex("History")
-                        .insert({
-                            tokenAddress,
-                            created_at: new Date(),
-                            chain: chainName,
-                            price: Number(price_val.price),
-                            History_created_at: price_val.date,
-                            user_id: obj.id,
-                            tokenName
-                        })
-                })
-            ).then(response => console.log("data inserted"))
+            // await Promise.all(
+            //     arr.map(price_val => {
+            //         return knex("History")
+            //             .insert({
+            //                 tokenAddress,
+            //                 created_at: new Date(),
+            //                 chain: chainName,
+            //                 price: Number(price_val.price),
+            //                 History_created_at: price_val.date,
+            //                 user_id: obj.id,
+            //                 tokenName
+            //             })
+            //     })
+            // ).then(response => console.log("data inserted"))
             // return res.json({ result: "one year result", arr })
             return{
                 status:HTTP.OK,
@@ -144,7 +145,10 @@ module.exports = {
             }
         }
         catch (error) {
-            console.log(error)
+            throw{
+                error:error,
+                status:500
+            }
         }
     },
     depositTokenPrice: async (req, res) => {
