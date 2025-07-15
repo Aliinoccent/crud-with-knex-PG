@@ -1,3 +1,6 @@
+const cron=require('node-cron')
+const moment=require('moment');
+
 module.exports={
     trunk: () => {
         const str = Math.floor(3.33333);
@@ -15,6 +18,12 @@ module.exports={
         const decimal = Number(3).toFixed(genrateRandomNumber(3));
         console.log(result)
         console.log(decimal);
+    },
+    cornJob:cron.schedule("* * * * * ",()=>{
+        console.log("run every 1 second");
+    }),
+    moments:timezone=()=>{
+        console.log(moment().format('LLLL'),'time format')
     }
 
 }

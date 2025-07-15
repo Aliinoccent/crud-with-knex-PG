@@ -13,7 +13,7 @@ app.use(morgan("dev"));
 app.use("/",mainRouters);
 Moralis_connection();
 
-precitce.trunk();
+precitce.moments()
 app.use(errorHandling);
 const port=process.env.PORT|| 5002;
 app.listen(port,()=>{
